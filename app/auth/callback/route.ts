@@ -11,10 +11,7 @@ export async function GET(request: Request) {
   }
 
   const cookieStore = await cookies();
-
-  const response = NextResponse.redirect(
-    new URL("/dashboard", request.url)
-  );
+  const response = NextResponse.redirect(new URL("/dashboard", request.url));
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,8 +31,14 @@ export async function GET(request: Request) {
     }
   );
 
-  // 🔥 This is what creates the session correctly
-  await supabase.auth.exchangeCodeForSession(code);
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    console.error("OAuth error:", error.message);
+    return NextResponse.redirect(new URL("/error", request.url));
+  }
+
+  console.log("Session created:", data.session);
 
   return response;
 }
