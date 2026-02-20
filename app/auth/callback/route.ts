@@ -22,23 +22,41 @@ export async function GET(request: Request) {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: any) {
-          response.cookies.set({ name, value, ...options });
+          // ✅ Fix: Proper cookie options for localhost + production
+          response.cookies.set({
+            name,
+            value,
+            path: "/", // must be "/" to work on all pages
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production", // only true in prod
+            ...options,
+          });
         },
         remove(name: string, options: any) {
-          response.cookies.set({ name, value: "", ...options });
+          response.cookies.set({
+            name,
+            value: "",
+            path: "/",
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            ...options,
+          });
         },
       },
     }
   );
 
+  // Exchange the OAuth code for a session
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    console.error("OAuth error:", error.message);
+    console.error("Supabase OAuth error:", error.message);
     return NextResponse.redirect(new URL("/error", request.url));
   }
 
   console.log("Session created:", data.session);
 
-  return response;
+  return response; // redirect to dashboard with session cookie set
 }
