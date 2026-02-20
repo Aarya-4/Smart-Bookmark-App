@@ -541,6 +541,13 @@
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
   integrity sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==
 
+"@supabase/auth-helpers-nextjs@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-nextjs/-/auth-helpers-nextjs-0.15.0.tgz#b12f7b7dc568e28f1245d4631253d53b341de697"
+  integrity sha512-VtXz3GGnxluoxks1g3SaCoYr2OZ7PgRukDl+pLWrDfD2dPDaG8hmkp5iBZsU+lmsDYALGNO2dgbymgpAfD8eCQ==
+  dependencies:
+    cookie "^1.0.2"
+
 "@supabase/auth-js@2.97.0":
   version "2.97.0"
   resolved "https://registry.yarnpkg.com/@supabase/auth-js/-/auth-js-2.97.0.tgz#7a80392af7f3f1c91f9a7bb91dec25ad69c84bce"
