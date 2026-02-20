@@ -1,3 +1,4 @@
+// app/api/auth/callback/route.ts
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -5,10 +6,7 @@ import { cookies } from "next/headers";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-
-  if (!code) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  if (!code) return NextResponse.redirect(new URL("/", request.url));
 
   const cookieStore = await cookies();
   const response = NextResponse.redirect(new URL("/dashboard", request.url));
@@ -22,14 +20,13 @@ export async function GET(request: Request) {
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: any) {
-          // ✅ Fix: Proper cookie options for localhost + production
           response.cookies.set({
             name,
             value,
-            path: "/", // must be "/" to work on all pages
+            path: "/",
             httpOnly: true,
             sameSite: "lax",
-            secure: process.env.NODE_ENV === "production", // only true in prod
+            secure: process.env.NODE_ENV === "production",
             ...options,
           });
         },
@@ -48,15 +45,11 @@ export async function GET(request: Request) {
     }
   );
 
-  // Exchange the OAuth code for a session
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-  if (error) {
-    console.error("Supabase OAuth error:", error.message);
+  if (error || !data.session) {
+    console.error(error);
     return NextResponse.redirect(new URL("/error", request.url));
   }
 
-  console.log("Session created:", data.session);
-
-  return response; // redirect to dashboard with session cookie set
+  return response;
 }
