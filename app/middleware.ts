@@ -1,18 +1,38 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from './lib/supabase/server'
+import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-export async function middleware(request: NextRequest) {
-  const supabase = createClient()
+export async function middleware(request: any) {
+  const response = NextResponse.next();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: any) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: any) {
+          response.cookies.set({ name, value: "", ...options });
+        },
+      },
+    }
+  );
 
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/', request.url))
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session && request.nextUrl.pathname.startsWith("/dashboard")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next()
+  return response;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
-}
+  matcher: ["/dashboard/:path*"],
+};

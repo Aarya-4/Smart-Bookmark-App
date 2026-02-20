@@ -1,8 +1,8 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createBrowserClient } from "@supabase/ssr";
 
 export function createClient() {
-  return createSupabaseClient(
-    'https://eozleqwzhgcziwjteaht.supabase.co',
-    'sb_publishable_3e9DvUS0Xz3j1yWSq0RhAw_71CmI4Go' // paste your anon key here
-  )
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 }
